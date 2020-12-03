@@ -130,13 +130,13 @@
 		// Add brushing
     	var brush = d3.brushX()              // Add the brush feature using the d3.brush function
         .extent( [ [0,0], [width,height] ] ) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-        // .on("end", updateChart)              // Each time the brush selection changes, trigger the 'updateChart' function
+        .on("end", updateChart)              // Each time the brush selection changes, trigger the 'updateChart' function
 
-
-
+		var main = svg.append('g')
+		.attr("clip-path", "url(#clip)")
 
 		// Draw the line
-		svg.selectAll(".line")
+		main.selectAll(".line")
 		.data(sumstat)
 		.enter()
 		.append("path")
@@ -161,6 +161,42 @@
 			});
 		});
 
+		// Add the brushing
+		main
+    	.append("g")
+      	.attr("class", "brush")
+      	.call(brush);
+
+		// A function that set idleTimeOut to null
+  		var idleTimeout;
+  		function idled() { idleTimeout = null; }
+
+  		// A function that update the chart for given boundaries
+  		function updateChart() {
+
+    		extent = d3.event.selection
+
+    		// If no selection, back to initial coordinate. Otherwise, update X axis domain
+    		if(!extent){
+      			if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+      				x.domain([ 4,8])
+    		} else {
+      			x.domain([ x.invert(extent[0]), x.invert(extent[1]) ])
+      			main.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+    		}
+
+			// Update axis and line position
+	    	xAxis.transition().duration(1000).call(d3.axisBottom(x))
+	    	main
+	      	.selectAll(".line")
+	      	.transition().duration(1000)
+			.attr("d", function(d){
+				return d3.line()
+				.x(function(d) { return x(d.year); })
+				.y(function(d) { return y(+d.n); })
+				(d.values)
+			})
+		}
 	})
 
 	</script>
