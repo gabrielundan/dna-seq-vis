@@ -50,64 +50,119 @@
 
 	<!-- D3 JS -->
 	<script src="client/d3.min.js"></script>
+	<script src="https://d3js.org/d3.v4.js"></script>
 
 	<!-- <script src="https://d3js.org/d3.v4.js"></script> -->
 
 	<!-- Project JS -->
 	<script>
-		// set the dimensions and margins of the graph
-		var margin = { top: 30, right: 30, bottom: 30, left: 30 },
-			width = 450 - margin.left - margin.right,
-			height = 450 - margin.top - margin.bottom;
 
-		// append the svg object to the body of the page
-		var svg = d3.select("#my_dataviz")
-			.append("svg")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-			.append("g")
-			.attr("transform",
-				"translate(" + margin.left + "," + margin.top + ")");
+	// randomly generated N = 40 length array 0 <= A[N] <= 39
+	var seqScores1 = Array.from({length: 40}, () => Math.floor(Math.random() * 40));
 
-		// Labels of row and columns
-		var myGroups = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-		var myVars = ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"]
+	var data = [
+		{
+			seqId: "AACTA2215-20",
+			species: "Tachystola",
+			seqChars: "--------LYFIFGIWAGMVGT----SLSLLIRAELGNP--------GSLIGDDQI-------YNTIVTAHAFIMIFFMVMPIMIGGFGNW---------",
+			seqScores: seqScores1
+		},
+		{
+			seqId: "AACTA2452-20",
+			species: "Cortinicara",
+			seqChars: "--------LYFIFGIWAGMVGT----SLSLLIRAELGNP--------GSLIGDDQI-------YNTIVTAHAFIMIFFMVMPIMIGGFGNW---------",
+			seqScores: seqScores1
+		}
+	]
 
-		// Build X scales and axis:
-		var x = d3.scaleBand()
-			.range([0, width])
-			.domain(myGroups)
-			.padding(0.01);
+	// set the dimensions and margins of the graph
+	var margin = {top: 10, right: 30, bottom: 30, left: 60},
+	width = 1000 - margin.left - margin.right,
+	height = 500 - margin.top - margin.bottom;
 
-		svg.append("g")
-			.attr("transform", "translate(0," + height + ")")
-			.call(d3.axisBottom(x))
+	// append the svg object to the body of the page
+	var svg = d3.select("#my_dataviz")
+	.append("svg")
+	.attr("width", width + margin.left + margin.right)
+	.attr("height", height + margin.top + margin.bottom)
+	.append("g")
+	.attr("transform",
+	"translate(" + margin.left + "," + margin.top + ")");
 
-		// Build X scales and axis:
-		var y = d3.scaleBand()
-			.range([height, 0])
-			.domain(myVars)
-			.padding(0.01);
+	//Read the data
+	d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered.csv", function(data) {
 
-		svg.append("g")
-			.call(d3.axisLeft(y));
+		// group the data: I want to draw one line per group
+		var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+		.key(function(d) { return d.name;})
+		.entries(data);
 
-		// Build color scale
-		var myColor = d3.scaleLinear()
-			.range(["white", "#69b3a2"])
-			.domain([1, 100])
+		// Add X axis --> it is a date format
+		var x = d3.scaleLinear()
+		.domain(d3.extent(data, function(d) { return d.year; }))
+		.range([ 0, width ]);
+		var xAxis = svg.append("g")
+		.attr("transform", "translate(0," + height + ")")
+		.call(d3.axisBottom(x).ticks(5));
 
-		var cell = svg.append("g")
+		// Add Y axis
+		var y = d3.scaleLinear()
+		.domain([0, d3.max(data, function(d) { return +d.n; })])
+		.range([ height, 0 ]);
+		var yAxis = svg.append("g")
+		.call(d3.axisLeft(y));
 
-		//Read the data
-		d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv", (d) =>
-			cell.append("rect")
-				.attr("x", x(d.group))
-				.attr("y", y(d.variable))
-				.attr("width", x.bandwidth())
-				.attr("height", y.bandwidth())
-				.style("fill", myColor(d.value))
-		)
+		// color palette
+		var res = sumstat.map(function(d){ return d.key }); // list of group names
+		var color = d3.scaleOrdinal()
+		.domain(res)
+		.range(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999'])
+
+		// Add a clipPath: everything out of this area won't be drawn.
+    	var clip = svg.append("defs").append("svg:clipPath")
+        .attr("id", "clip")
+        .append("svg:rect")
+        .attr("width", width )
+        .attr("height", height )
+        .attr("x", 0)
+        .attr("y", 0)
+
+		// Add brushing
+    	var brush = d3.brushX()              // Add the brush feature using the d3.brush function
+        .extent( [ [0,0], [width,height] ] ) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+        // .on("end", updateChart)              // Each time the brush selection changes, trigger the 'updateChart' function
+
+
+
+
+		// Draw the line
+		svg.selectAll(".line")
+		.data(sumstat)
+		.enter()
+		.append("path")
+		.attr("fill", "none")
+		.attr("stroke", function(d){ return color(d.key) })
+		.attr("stroke-width", 1.5)
+		.attr("d", function(d){
+			return d3.line()
+			.x(function(d) { return x(d.year); })
+			.y(function(d) { return y(+d.n); })
+			(d.values)
+		})
+		.on("mouseover", function () {
+    		d3.select(this).style("stroke-width", 5);
+		})
+		.on("mouseout", function () {
+    		d3.select(this).style("stroke-width", 2);
+		})
+		.on("click", function () {
+    		d3.select(this).attr("stroke", function(d){
+				return color("#000000")
+			});
+		});
+
+	})
+
 	</script>
 </body>
 
