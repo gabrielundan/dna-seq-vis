@@ -6,6 +6,7 @@ var margin = { top: 30, right: 30, bottom: 30, left: 30 },
 // append the svg object to the body of the page
 var svg = d3.select("#my_dataviz")
     .append("svg")
+    .attr("id", "base-svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -58,6 +59,7 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/he
     // Three function that change the tooltip when user hover / move / leave a cell
     var mouseover = function () {
         tooltip.style("opacity", 1)
+        highlight.style("opacity", 1)
     }
 
     function mousemove(event) {
@@ -65,10 +67,13 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/he
             .html("The exact value of<br>this cell is: " + d.value)
             .style("left", (event.layerX + 45) + "px")
             .style("top", (event.layerY) + "px")
+        highlight
+               .attr("y", event.target.y.baseVal.value + margin.bottom)
     }
 
     var mouseleave = function () {
         tooltip.style("opacity", 0)
+        highlight.style("opacity", 0)
     }
 
     var box = svg.append("g");
@@ -96,5 +101,18 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/he
         .attr("y", posY + (height * 2 / 3))
         .text(d.group)
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
 })
+
+// create rectangle for highlighting
+var highlight = d3.select("#base-svg")
+    .append("rect")
+    .attr("id", "hl-rect")
+    .attr("x", 31)
+    .attr("y", 31)
+    .attr("height", y.bandwidth())
+    .attr("width", x.step() * myGroups.length)
+    .style("stroke", "#000")
+    .style("stroke-width", 2)
+    .style("fill", "none")
+    .attr("opacity", 0)
