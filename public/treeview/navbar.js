@@ -103,7 +103,6 @@ function do_something_with(data, matrix) {
 			letters.forEach(letter => {
 				if (letter != "") {
 					xletters.push(letter);
-					console.log("one letter added!");
 				}
 		
 			});
@@ -129,7 +128,7 @@ function do_something_with(data, matrix) {
 
 	
 	console.log(scoreMap);
-	
+
 	if (testingMode ) {	var lines = data.split("\n", 400);}
 	else {	var lines = data.split("\n");}
 
