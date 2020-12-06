@@ -1,2 +1,2 @@
-/data/*.faa
+/public/data/*.faa
 .DS_Store
