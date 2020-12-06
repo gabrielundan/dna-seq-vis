@@ -9,8 +9,12 @@
 	<!-- Bootstrap 4 CSS -->
 	<link rel="stylesheet" type="text/css" href="client/bootstrap.min.css" />
 
+
+
 	<!-- Project CSS -->
 	<link rel="stylesheet" type="text/css" href="client/style.css" />
+
+	<link id="stm" type="text" href="treeview/sequences_tax_mapping.txt" />
 
 </head>
 
@@ -32,6 +36,8 @@
 			</ul>
 		</div>
 	</nav>
+	<div id = "tree" style="overflow: auto; max-height: 600px; float:right; max-width:fit-content;">	
+	</div>
 	<div class="container">
 		<h2>Visualizing DNA Sequences</h2>
 		<br>
@@ -40,20 +46,25 @@
 			sequences across different species.
 		</p>
 
-		<div id="my_dataviz"></div>
+		
 	</div>
 
+	<div id="tree"/>
 	<!-- JavaScript For Bootstrap 4 -->
-	<script src="client/jquery.slim.min.js"></script>
+	<script src="client/jquery.min.js"></script>
 	<script src="client/popper.min.js"></script>
 	<script src="client/bootstrap.min.js"></script>
 
 	<!-- D3 JS -->
 	<script src="client/d3.min.js"></script>
 
+	<!---Patternfly Treeview-->
+	<script src="treeview/bootstrap-treeview.js"></script>
+
 	<!-- <script src="https://d3js.org/d3.v4.js"></script> -->
 
 	<!-- Project JS -->
+	<script src="treeview/navbar.js"></script>
 	<script>
 		// set the dimensions and margins of the graph
 		var margin = { top: 30, right: 30, bottom: 30, left: 30 },
@@ -109,6 +120,8 @@
 				.style("fill", myColor(d.value))
 		)
 	</script>
+
+
 </body>
 
 </html>
