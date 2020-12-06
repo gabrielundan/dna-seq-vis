@@ -4,14 +4,19 @@ var currentlyActiveSpecies = []; //Reference this or getCurrentSpecies for a lis
 
 var testingMode = true; //HARD-CAPS NUM LINES READ TO 400
 
+var scoreMap = new Map(); //key-value pair map of scores. String-> int. Example. "AA" -> 4
+
 function loadTree () { 
 
-	jQuery.get('treeview/sequences_tax_mapping.txt', function(data) {
-		do_something_with(data)
+	jQuery.get('treeview/matrix.txt', function(matrix) {
+		jQuery.get('treeview/sequences_tax_mapping.txt', function(data) {
+			do_something_with(data, matrix)
+		 }, 'text');
 	 }, 'text');
+
 	addCheckBox("Alpha", );
 	addCheckBox("Beta");
-	addCheckBox("Charlie");
+	addCheckBox("Delta");
 
 }
 
@@ -38,12 +43,12 @@ function addCheckBox(name, parent = document.getElementById("tree")) {
   newDiv.style.paddingLeft = "20px";
 
   if (parent != document.getElementById("tree")) {
-	newDiv.classList.add("nested");
 }
 
   parent.appendChild(newDiv);
 }
 
+//Calls every time a checkbox value toggles
 function checkboxClick(value, nowChecked) {
 	if (nowChecked) {
 		console.log(value + " added to active!");
@@ -60,6 +65,8 @@ function checkboxClick(value, nowChecked) {
 		console.log(currentlyActiveSpecies);
 	}
 
+	//
+
 }
 
 function createNewParentDiv(name, parent = document.getElementById("tree")) {
@@ -71,7 +78,6 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 	newDiv.className = name.split(" ").join(""); //crashes if name is passed to classlist...
 	newDiv.classList.add("collapses");
 	if (parent != document.getElementById("tree")) {
-		newDiv.classList.add("nested");
 	}
 	newDiv.addEventListener("click", function() {
 		this.querySelector(".nested").classList.toggle("active");
@@ -87,7 +93,43 @@ function insertToTreeDiv(newDiv) {
 	currentDiv.appendChild(newDiv);
 }
 
-function do_something_with(data) {
+function do_something_with(data, matrix) {
+		
+	var scorelines = matrix.split("\n");
+	var xletters = [];
+	scorelines.forEach(element => {
+		if (element == scorelines[0]) {
+			letters = element.split(" ");
+			letters.forEach(letter => {
+				if (letter != "") {
+					xletters.push(letter);
+					console.log("one letter added!");
+				}
+		
+			});
+		} else {
+			var scores = element.split(" ");
+			var yLetter = "";
+			var xPos = 0;
+			scores.forEach(digit => {
+				if (digit != "") {
+					if (yLetter == "") {yLetter = digit;}
+					else {
+						var intdigit = parseInt(digit);
+						var key = yLetter + xletters[xPos];
+						scoreMap.set(key, intdigit);
+						xPos += 1;
+					}
+				}
+		
+			});
+		}
+
+	});
+
+	
+	console.log(scoreMap);
+	
 	if (testingMode ) {	var lines = data.split("\n", 400);}
 	else {	var lines = data.split("\n");}
 
@@ -122,5 +164,5 @@ function do_something_with(data) {
 		}
 
 	});
-	console.log(species.length);
+
 }
