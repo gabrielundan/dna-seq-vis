@@ -6,6 +6,8 @@ var testingMode = false; //HARD-CAPS NUM LINES READ TO 400
 
 var scoreMap = new Map(); //key-value pair map of scores. String-> int. Example. "AA" -> 4
 
+var taxonomyIdMap = new Map();
+
 function loadTree () { 
 
 	jQuery.get('treeview/matrix.txt', function(matrix) {
@@ -13,7 +15,10 @@ function loadTree () {
 			do_something_with(data, matrix)
 		 }, 'text');
 	 }, 'text');
-
+	
+	jQuery.get('treeview/aligned_unenrolled.faa', function(data) {
+		readSequences(data);
+	});
 }
 
 function getCurrentSpecies() {
@@ -194,4 +199,68 @@ function do_something_with(data, matrix) {
 
 	});
 
+}
+
+/**
+ * Populates taxonomyIdMap
+ * @param {string} text 
+ */
+function readSequences(text) {
+	let lines = text.split("\n");
+	lines.forEach((line) => {
+		if (line.length != 0) {
+			let taxonomyId = line.substring(1, line.indexOf("|"));
+			let sequence = line.substring(40);
+			taxonomyIdMap.set(taxonomyId, sequence);
+		}
+	});
+}
+
+/**
+ * Computes individual score, rounded to 2 decimal places
+ * @param {string} query A single letter to score
+ * @param {Array.string} refs Array of string to compare query against 
+ * @return {number} Score of the individual query letter
+ */
+function computeScore(query, refs) {
+	let score = 0;
+	let multiplier = 2 / refs.length;
+	refs.forEach((letter) => {
+		score += scoreMap.get(`${query}${letter}`) * multiplier;
+	});
+	return Number(score.toFixed(2));
+}
+
+/**
+ * Returns a map where each key is a taxonomyId that holds an array containing it's scores
+ * @param {Array.string} taxonomyIds Array of taxonomy IDs to score
+ * @return {Map} Each key is a taxonomyId (ex. "AACTA2215-20") that holds an array of integers representing the
+ * score for each character in its sequence (ex. [2.12, 5.29, ...]).
+ */
+function computeEntryScores(taxonomyIds) {
+	let scoreMap = new Map();
+	Array(taxonomyIds).forEach((id) => {
+		let sequence = taxonomyIdMap.get(id);
+		let scores = [];
+		for (let i = 0; i < sequence.length; i++) {
+			let query = sequence.charAt(i);
+			let refs = getRefsByIndex(i);
+			scores.push(computeScore(query, refs));
+		}
+		scoreMap.set(id, scores);
+	});
+	return scoreMap;
+}
+
+/**
+ * Creates an array containing the letters of each sequence at a given index
+ * @param {number} sequenceIndex Integer
+ * @return {Array} Array containing the letters of each sequence at provided index
+ */
+function getRefsByIndex(sequenceIndex) {
+	let refs = [];
+	taxonomyIdMap.forEach((value) => {
+		refs.push(value.charAt(sequenceIndex));
+	});
+	return refs;
 }
