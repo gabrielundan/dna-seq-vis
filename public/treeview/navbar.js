@@ -254,13 +254,14 @@ function computeEntryScores(taxonomyIds) {
 
 /**
  * Creates an array containing the letters of each sequence at a given index
- * @param {number} sequenceIndex Integer
+ * @param {number} sequenceIndex Integer 
+ * @param {Array.string} compareIds Array of taxonomy IDs to fetch from
  * @return {Array} Array containing the letters of each sequence at provided index
  */
-function getRefsByIndex(sequenceIndex) {
+function getRefsByIndex(sequenceIndex, compareIds) {
 	let refs = [];
-	taxonomyIdMap.forEach((value) => {
-		refs.push(value.charAt(sequenceIndex));
+	compareIds.forEach((value) => {
+		refs.push(taxonomyIdMap.get(value).charAt(sequenceIndex));
 	});
 	return refs;
 }
