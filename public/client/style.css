@@ -11,3 +11,15 @@ body {
 .active {
 	display: block;
   }
+  /* Create the caret/arrow with a unicode, and style it */
+.collapses::before {
+	content: "\25B6";
+	color: black;
+	display: inline-block;
+	margin-right: 6px;
+  }
+  
+  /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+  .collapsed::before {
+	transform: rotate(90deg);
+  }
