@@ -148,7 +148,7 @@ function propogateBelow(element, checked) {
 
 }
 //Calls every time a checkbox value toggles
-function checkboxClick(value, nowChecked, pingChange = true) {
+function checkboxClick(value, nowChecked, pingC = true) {
 	if (nowChecked) {
 		console.log(value + " added to active!");
 		if (!currentlyActiveSpecies.includes(value)) {
@@ -161,7 +161,7 @@ function checkboxClick(value, nowChecked, pingChange = true) {
 			currentlyActiveSpecies.splice(index, 1);
 		}
 	}
-	if (pingChange) {
+	if (pingC) {
 		pingChange();
 	}
 
