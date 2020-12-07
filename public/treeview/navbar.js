@@ -202,8 +202,8 @@ function do_something_with(data, matrix) {
 }
 
 /**
- * Populates taxonomyIdMap
- * @param {string} text 
+ * Populates taxonomyIdMap, a map where each key is a taxonomyId whose value is the corresponding DNA sequence.
+ * @param {string} text Text content read from the *.faa file containing DNA sequences
  */
 function readSequences(text) {
 	let lines = text.split("\n");
