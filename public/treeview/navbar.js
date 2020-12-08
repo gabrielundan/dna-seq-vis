@@ -32,12 +32,14 @@ function getCurrentSpecies()
 }
 
 /**
- * Map of taxonomy ID to sequence. "AACTA2215-20":"<Corresponding 3406-char DNA sequence>"
+ * Map of taxonomy ID to sequence.
+ * Example: "AACTA2215-20":"<Corresponding 3406-char DNA sequence>"
  */
 var taxonomyIdMap = new Map();
 
 /**
- * Map of species to array of sc. "":"AACTA2215-20"
+ * Map of species to array of Taxonomy IDs that belong to that species.
+ * Example "Clerarcha":["WALPB3746-14", "WALPB3748-14", "WALPB4400-14", "WALPB5132-14"]
  */
 var speciesMap = new Map();
 
@@ -57,7 +59,8 @@ function loadTree () {
 
 	jQuery.get('treeview/matrix.txt', function(matrix) {
 		jQuery.get('treeview/sequences_tax_mapping.txt', function(data) {
-			do_something_with(data, matrix)
+            do_something_with(data, matrix);
+            mapSpecies(data);
 		 }, 'text');
 	 }, 'text');
 	
@@ -266,9 +269,6 @@ function do_something_with(data, matrix) {
 
 	});
 
-	
-	console.log(scoreMap);
-
 	if (testingMode ) {	var lines = data.split("\n", 400);}
 	else {	var lines = data.split("\n");}
 
@@ -372,4 +372,37 @@ function getRefsByIndex(sequenceIndex, compareIds) {
 		refs.push(taxonomyIdMap.get(value).charAt(sequenceIndex));
 	});
 	return refs;
+}
+
+/**
+ * Populates speciesMap, a map where each key is a species whose value an array of Taxonomy IDs belonging to that species.
+ * @param {string} text Text content read from the *.faa file containing DNA sequences
+ */
+function mapSpecies(text) {
+	let lines = text.split("\n");
+	lines.forEach((line) => {
+		if (line.length > 0) {
+			let pipeSplit = line.split("|");
+			let taxId = pipeSplit[0];
+			let species = pipeSplit[1].substring(0, pipeSplit[1].indexOf("."));
+			if (speciesMap.has(species)) {
+				let taxIdArr = speciesMap.get(species);
+				taxIdArr.push(taxId);
+				speciesMap.set(species, taxIdArr);
+			} else {
+				speciesMap.set(species, [taxId]);
+			}
+		}
+	});
+}
+
+/**
+ * @return {Array.string} Array of strings where each element is a Taxonomy ID that needs to be drawn
+ */
+function getCurrentlyActiveTaxIds() {
+	let taxIdArr = [];
+	currentlyActiveSpecies.forEach((species) => {
+		taxIdArr = taxIdArr.concat(speciesMap.get(species));
+	});
+	return taxIdArr;
 }
