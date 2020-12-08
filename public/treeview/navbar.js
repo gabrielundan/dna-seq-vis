@@ -42,11 +42,11 @@ var taxonomyIdMap = new Map();
 var speciesMap = new Map();
 
 /**
- * 
- * 
+ *
+ *
  * BEGIN OBSCURE NONSENSE. BEWARE YE ALL WHO VENTURE PAST THIS POINT
- * 
- * 
+ *
+ *
  */
 
 
@@ -69,10 +69,10 @@ function loadTree() {
 
 function addCheckBox(name, parent = document.getElementById("tree")) {
 	if (document.getElementsByClassName(name.split(" ").join("")).length > 0) { return document.getElementsByClassName(name.split(" ").join(""))[0]; }
-	// create a new div element 
+	// create a new div element
 	const newDiv = document.createElement("div");
 
-	// and give it some content 
+	// and give it some content
 	newDiv.style.marginLeft = "25px";
 	const newContent = document.createTextNode("  " + name);
 	const newCheckbox = document.createElement("INPUT");
@@ -214,10 +214,11 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 		let scores = [];
 		const ids = getCurrentlyActiveTaxIds();
 		scores = computeEntryScores(ids, ids);
-		
+
 		// console.log(scores);
 
 		// update line chart
+		drawLinesGraph(400, 1200, scores, 'Score');
 	})
 
 	newDiv.appendChild(newContent);
@@ -273,7 +274,6 @@ function populateScoreMap(data, matrix) {
 
 	});
 
-
 	// console.log(scoreMap);
 
 	if (testingMode) { var lines = data.split("\n", 400); }
@@ -297,16 +297,9 @@ function populateScoreMap(data, matrix) {
 				}
 				if (!pleaseBreak) {
 					currentParent = createNewParentDiv(parent, currentParent); //create current parent, and update tracked current parent
-
 				}
 			})
 			addCheckBox(half2[0], currentParent); //add the current species to the bottom of the parent tree
-
-
-
-
-
-
 
 		}
 
@@ -332,7 +325,7 @@ function readSequences(text) {
 /**
  * Computes individual score, rounded to 2 decimal places
  * @param {string} query A single letter to score
- * @param {Array.string} refs Array of string to compare query against 
+ * @param {Array.string} refs Array of string to compare query against
  * @return {number} Score of the individual query letter
  */
 function computeScore(query, refs) {

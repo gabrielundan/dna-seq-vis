@@ -1,29 +1,42 @@
-// generate data
-var values = [];
-//add more pushes for more lines
-for (var i = 0; i < 10; i++) {
-    values.push(fillData());
-}
-
-function fillData () {
-    var data = [];
-    for(var i=0; i<20; i++) {
-        var random = d3.randomNormal(0, 100)();
-        data.push([i, random]);
-    }
-    return data;
-}
-console.log (values);
-
-//-------------------------------
 d3.selection.prototype.moveToFront = function() {
     return this.each(function(){
         this.parentNode.appendChild(this);
     });
 };
-var drawLinesGraph = function(containerHeight, containerWidth, data, yLabel){
 
-    var svg = d3.select('body').append('svg')
+function fillData(key, value) {
+    var data = [];
+    for (let i = 0; i < value.length; i++) {
+        data.push([i, value[i]]);
+    }
+    return data;
+}
+
+function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
+    let data = [];
+    let taxIds = [];
+    for (let [key, value] of dataInput) {
+        data.push(fillData(key, value));
+        taxIds.push(key);
+    }
+    d3.select("#line-graph").selectAll("svg").remove();
+    d3.select("#line-graph").selectAll("g").remove();
+
+    let tooltip = d3.select("#line-graph")
+    .append("div")
+    .style("opacity", 1)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+    .style("width", "12rem")
+    .style("height", "2.2rem")
+    .text("")
+
+    let svg = d3.select('#line-graph')
+    .append('svg')
     .attr('width', containerWidth)
     .attr('height', containerHeight);
 
@@ -62,14 +75,14 @@ var drawLinesGraph = function(containerHeight, containerWidth, data, yLabel){
     var xAxis = d3.axisBottom(xScale),
     yAxis = d3.axisLeft(yScale);
 
-    var brush = d3.brush().on("end", brushended),
-    idleTimeout,
-    idleDelay = 350;
+    // var brush = d3.brush().on("end", brushended),
+    // idleTimeout,
+    // idleDelay = 350;
 
-    var drag = d3.drag().on('drag', dragged);
+    // var drag = d3.drag().on('drag', dragged);
 
     svg.append("g")
-    .attr("class", "brush")
+    // .attr("class", "brush")
     // .call(brush);
 
     g.append('g')
@@ -102,21 +115,7 @@ var drawLinesGraph = function(containerHeight, containerWidth, data, yLabel){
     .attr('class', 'main')
     .attr('clip-path', 'url(#clip)');
 
-    var tooltip = d3.select("#my_dataviz")
-    .append("div")
-    .style("opacity", 1)
-    .attr("class", "tooltip")
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px")
-    .style("width", "12rem")
-    .style("height", "2.2rem")
-    .text("Tooltip text...")
-
-
-    for( let i = 0; i < data.length; i++ ){
+    for (let i = 0; i < data.length; i++) {
         main.append('path')
         .datum(data[i])
         .attr('d', line)
@@ -128,7 +127,7 @@ var drawLinesGraph = function(containerHeight, containerWidth, data, yLabel){
         .on("mouseover", function () {
             d3.select(this).style("stroke-width", 4).attr('opacity', '1').moveToFront();
             // tooltip.style("opacity", 1);
-            tooltip.text("ID: " + data[i][data[i].length/2][1]);
+            tooltip.text("ID: " + taxIds[i]);
         })
         .on("mouseout", function () {
             d3.select(this).style("stroke-width", 2).attr('opacity', 0.5);
@@ -149,113 +148,113 @@ var drawLinesGraph = function(containerHeight, containerWidth, data, yLabel){
         //   .attr('class', 'circles');
     }
 
+
     //voronoi
 
-    var vorData = d3.merge(data);
-
-    var voronoiDiagram = d3.voronoi()
-    .x(function(d) {return xScale(d[0]); })
-    .y(function(d) {return yScale(d[1]); })
-    .size([containerWidth, containerHeight])(vorData);
-
-    var voronoiRadius = width;
+    // var vorData = d3.merge(data);
+    //
+    // var voronoiDiagram = d3.voronoi()
+    // .x(function(d) {return xScale(d[0]); })
+    // .y(function(d) {return yScale(d[1]); })
+    // .size([containerWidth, containerHeight])(vorData);
+    //
+    // var voronoiRadius = width;
 
 
     //focus
 
-    var focus = g.append('g').style('display', 'none');
-
-    focus.append('line')
-    .attr('id', 'focusLineX')
-    .attr('class', 'focusLine');
-    focus.append('line')
-    .attr('id', 'focusLineY')
-    .attr('class', 'focusLine');
+    // var focus = g.append('g').style('display', 'none');
+    //
+    // focus.append('line')
+    // .attr('id', 'focusLineX')
+    // .attr('class', 'focusLine');
+    // focus.append('line')
+    // .attr('id', 'focusLineY')
+    // .attr('class', 'focusLine');
     // focus.append('circle')
     //     .attr('id', 'focusCircle')
     //     .attr('r', 4)
     //     .attr('class', 'circle focusCircle');
 
 
-    svg.select('.overlay')
-    .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
-    .attr('width', width)
-    .attr('height', height)
-    .on('mouseover', function() { focus.style('display', null); })
-    .on('mouseout', function() { focus.style('display', 'none'); })
-    .on('mousemove', function() {
-
-        var [mx, my] = d3.mouse(this);
-
-        // use the new diagram.find() function to find the Voronoi site
-        // closest to the mouse, limited by max distance voronoiRadius
-        var site = voronoiDiagram.find(mx, my, voronoiRadius);
-
-        var x = site[0];
-        var y = site[1];
-
-        focus.select('#focusCircle')
-        .attr('cx', x)
-        .attr('cy', y);
-        focus.select('#focusLineX')
-        .attr('x1', x).attr('y1', yScale(yScale.domain()[0]))
-        .attr('x2', x).attr('y2', yScale(yScale.domain()[1]));
-        focus.select('#focusLineY')
-        .attr('x1', xScale(xScale.domain()[0])).attr('y1', y)
-        .attr('x2', xScale(xScale.domain()[1])).attr('y2', y);
-    })
-    .on('contextmenu', function() {
-        this.dispatchEvent(new Event('drag'));
-        d3.event.preventDefault();
-    });
+    // svg.select('.overlay')
+    // .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+    // .attr('width', width)
+    // .attr('height', height)
+    // .on('mouseover', function() { focus.style('display', null); })
+    // .on('mouseout', function() { focus.style('display', 'none'); })
+    // .on('mousemove', function() {
+    //
+    //     var [mx, my] = d3.mouse(this);
+    //
+    //     // use the new diagram.find() function to find the Voronoi site
+    //     // closest to the mouse, limited by max distance voronoiRadius
+    //     var site = voronoiDiagram.find(mx, my, voronoiRadius);
+    //
+    //     var x = site[0];
+    //     var y = site[1];
+    //
+    //     focus.select('#focusCircle')
+    //     .attr('cx', x)
+    //     .attr('cy', y);
+    //     focus.select('#focusLineX')
+    //     .attr('x1', x).attr('y1', yScale(yScale.domain()[0]))
+    //     .attr('x2', x).attr('y2', yScale(yScale.domain()[1]));
+    //     focus.select('#focusLineY')
+    //     .attr('x1', xScale(xScale.domain()[0])).attr('y1', y)
+    //     .attr('x2', xScale(xScale.domain()[1])).attr('y2', y);
+    // })
+    // .on('contextmenu', function() {
+    //     this.dispatchEvent(new Event('drag'));
+    //     d3.event.preventDefault();
+    // });
     // .on('drag', drag);
 
 
-    function brushended() {
-        var s = d3.event.selection;
-        if (!s) {
-            if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
-            xScale.domain([minX, maxX]);
-            yScale.domain([minY, maxY]);
-        } else {
-            xScale.domain([s[0][0] * ratio, s[1][0]].map(xScale.invert, xScale));
-            yScale.domain([s[1][1], s[0][1] * ratio].map(yScale.invert, yScale));
-            svg.select(".brush").call(brush.move, null);
-        }
-        zoom();
-    }
+    // function brushended() {
+    //     var s = d3.event.selection;
+    //     if (!s) {
+    //         if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
+    //         xScale.domain([minX, maxX]);
+    //         yScale.domain([minY, maxY]);
+    //     } else {
+    //         xScale.domain([s[0][0] * ratio, s[1][0]].map(xScale.invert, xScale));
+    //         yScale.domain([s[1][1], s[0][1] * ratio].map(yScale.invert, yScale));
+    //         svg.select(".brush").call(brush.move, null);
+    //     }
+    //     zoom();
+    // }
+    //
+    // function idled() {
+    //     idleTimeout = null;
+    // }
 
-    function idled() {
-        idleTimeout = null;
-    }
+    // function zoom() {
+    //     var t = svg.transition().duration(750);
+    //     svg.select(".axis--x").transition(t).call(xAxis);
+    //     g.select(".axis--y").transition(t).call(yAxis);
+    //     g.selectAll(".circles").transition(t)
+    //     .attr("cx", function(d) { return xScale(d[0]); })
+    //     .attr("cy", function(d) { return yScale(d[1]); });
+    //     g.selectAll(".line").transition(t)
+    //     .attr("d", function(d) { return line(d); });
+    //
+    //     voronoiDiagram = d3.voronoi()
+    //     .x(function(d) {return xScale(d[0]); })
+    //     .y(function(d) {return yScale(d[1]); })
+    //     .size([containerWidth, containerHeight])(vorData);
+    //
+    // }
 
-    function zoom() {
-        var t = svg.transition().duration(750);
-        svg.select(".axis--x").transition(t).call(xAxis);
-        g.select(".axis--y").transition(t).call(yAxis);
-        g.selectAll(".circles").transition(t)
-        .attr("cx", function(d) { return xScale(d[0]); })
-        .attr("cy", function(d) { return yScale(d[1]); });
-        g.selectAll(".line").transition(t)
-        .attr("d", function(d) { return line(d); });
-
-        voronoiDiagram = d3.voronoi()
-        .x(function(d) {return xScale(d[0]); })
-        .y(function(d) {return yScale(d[1]); })
-        .size([containerWidth, containerHeight])(vorData);
-
-    }
-
-    function dragged() {
-        d3.selectAll('.line')
-        .attr('transform', `translate(${d3.event.x}, ${d3.event.y})`);
-        d3.selectAll('.line')
-        .attr('transform', `translate(${d3.event.x}, ${d3.event.y})`);
-        g.select(".axis--x").call(xAxis);
-        g.select(".axis--y").call(yAxis);
-    }
-
-
+    // function dragged() {
+    //     d3.selectAll('.line')
+    //     .attr('transform', `translate(${d3.event.x}, ${d3.event.y})`);
+    //     d3.selectAll('.line')
+    //     .attr('transform', `translate(${d3.event.x}, ${d3.event.y})`);
+    //     g.select(".axis--x").call(xAxis);
+    //     g.select(".axis--y").call(yAxis);
+    // }
 }
 
-drawLinesGraph(400, 1200, values, 'Score');
+//draw empty graph
+drawLinesGraph(400, 1200, [], 'Score');
