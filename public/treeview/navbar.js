@@ -16,8 +16,7 @@ var scoreMap = new Map();
 /**
  * Outside functions should be put in here. pingChange is called every time a change occurs in the currentlyActiveSpecies[]
  */
-function pingChange() 
-{
+function pingChange() {
 	console.log("active species updated!");
 	console.log(currentlyActiveSpecies);
 	//todo: put outside references here
@@ -26,8 +25,7 @@ function pingChange()
 /**
  * Simple getter for currentlyActiveSpecies[]
  */
-function getCurrentSpecies() 
-{
+function getCurrentSpecies() {
 	return currentlyActiveSpecies;
 }
 
@@ -51,52 +49,51 @@ var speciesMap = new Map();
  * 
  */
 
- 
+
 //function called on page load
 document.body.onload = loadTree;
 
-function loadTree () { 
+function loadTree() {
 
-	jQuery.get('treeview/matrix.txt', function(matrix) {
-		jQuery.get('treeview/sequences_tax_mapping.txt', function(data) {
-            do_something_with(data, matrix);
-            mapSpecies(data);
-		 }, 'text');
-	 }, 'text');
-	
-	jQuery.get('treeview/aligned_unenrolled.faa', function(data) {
+	jQuery.get('treeview/matrix.txt', function (matrix) {
+		jQuery.get('treeview/sequences_tax_mapping.txt', function (data) {
+			do_something_with(data, matrix)
+		}, 'text');
+	}, 'text');
+
+	jQuery.get('https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/aligned_unenrolled.faa', function (data) {
 		readSequences(data);
 	});
 }
 
 function addCheckBox(name, parent = document.getElementById("tree")) {
-	if(document.getElementsByClassName(name.split(" ").join("")).length > 0) {return document.getElementsByClassName(name.split(" ").join(""))[0];}
-  // create a new div element 
-  const newDiv = document.createElement("div"); 
-  
-  // and give it some content 
-  newDiv.style.marginLeft = "25px";
-  const newContent = document.createTextNode("  " + name); 
-  const newCheckbox = document.createElement("INPUT");
-  newCheckbox.setAttribute("type", "checkbox");
-  newCheckbox.setAttribute("value", name);
-  newCheckbox.classList.add("checkbox");
-  newCheckbox.onclick = function() {checkboxClick(newCheckbox.value, newCheckbox.checked); checkAbove(newDiv);}
-  
-  // add the text node to the newly created div
-  newDiv.classList.add(name.split(" ").join(""));
-  newDiv.appendChild(newCheckbox);
-  newDiv.appendChild(newContent);  
+	if (document.getElementsByClassName(name.split(" ").join("")).length > 0) { return document.getElementsByClassName(name.split(" ").join(""))[0]; }
+	// create a new div element 
+	const newDiv = document.createElement("div");
 
-  newDiv.style.paddingLeft = "20px";
-  newDiv.classList.add("nested");
-  //newDiv.classList.add("active");
+	// and give it some content 
+	newDiv.style.marginLeft = "25px";
+	const newContent = document.createTextNode("  " + name);
+	const newCheckbox = document.createElement("INPUT");
+	newCheckbox.setAttribute("type", "checkbox");
+	newCheckbox.setAttribute("value", name);
+	newCheckbox.classList.add("checkbox");
+	newCheckbox.onclick = function () { checkboxClick(newCheckbox.value, newCheckbox.checked); checkAbove(newDiv); }
+
+	// add the text node to the newly created div
+	newDiv.classList.add(name.split(" ").join(""));
+	newDiv.appendChild(newCheckbox);
+	newDiv.appendChild(newContent);
+
+	newDiv.style.paddingLeft = "20px";
+	newDiv.classList.add("nested");
+	//newDiv.classList.add("active");
 
 
-  if (parent != document.getElementById("tree")) {
-}
+	if (parent != document.getElementById("tree")) {
+	}
 
-  parent.appendChild(newDiv);
+	parent.appendChild(newDiv);
 }
 
 function checkAbove(element) {
@@ -118,7 +115,7 @@ function checkAbove(element) {
 			return;
 		}
 		if (childbox != checkbox) {
-			if(childbox.checked) {
+			if (childbox.checked) {
 				allAreDisabled = false;
 			} else {
 				allAreEnabled = false;
@@ -130,7 +127,7 @@ function checkAbove(element) {
 		checkbox.checked = true;
 		checkbox.indeterminate = false;
 		console.log("all are enabled!");
-	} 
+	}
 	else if (allAreDisabled) {
 		checkbox.checked = false;
 		checkbox.indeterminate = false;
@@ -155,7 +152,7 @@ function propogateBelow(element, checked) {
 		childbox.indeterminate = false;
 		if (childbox.value != "on") {
 			checkboxClick(childbox.value, checked, false)
-			
+
 		}
 	})
 
@@ -178,13 +175,20 @@ function checkboxClick(value, nowChecked, pingC = true) {
 		pingChange();
 	}
 
-	//
+	// compute score of each row
+	let newScore = [];
 
+	getCurrentSpecies().forEach((sequence) => {
+		let ref = getCurrentSpecies();
+		newScore.push(computeEntryScores(sequence, ref.splice(ref.indexOf(sequence), 1)))
+	});
+
+	console.log(newScore);
 }
 
 function createNewParentDiv(name, parent = document.getElementById("tree")) {
-	if(document.getElementsByClassName(name.split(" ").join("")).length > 0 || (name.length < 2)) { return document.getElementsByClassName(name.split(" ").join(""))[0];}
-    const newDiv = document.createElement("div"); 
+	if (document.getElementsByClassName(name.split(" ").join("")).length > 0 || (name.length < 2)) { return document.getElementsByClassName(name.split(" ").join(""))[0]; }
+	const newDiv = document.createElement("div");
 	const newContent = document.createElement("div");
 	const newCheckbox = document.createElement("INPUT");
 	newCheckbox.setAttribute("type", "checkbox");
@@ -197,7 +201,7 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 
 
 
-	newContent.addEventListener("click", function() {
+	newContent.addEventListener("click", function () {
 		var children = this.parentElement.querySelectorAll(".nested");
 
 		children.forEach(child => {
@@ -206,10 +210,10 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 			}
 		})
 		newContent.classList.toggle("collapsed");
-		
+
 		console.log("clicked one!");
 	});
-	newCheckbox.addEventListener("click", function(event) {
+	newCheckbox.addEventListener("click", function (event) {
 		event.stopPropagation();
 		propogateBelow(newDiv, newCheckbox.checked);
 		checkAbove(newDiv);
@@ -227,17 +231,17 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 	newDiv.classList.add("nested");
 	//newDiv.classList.add("active");
 
-    parent.appendChild(newDiv);
-    return newDiv;
+	parent.appendChild(newDiv);
+	return newDiv;
 }
 
 function insertToTreeDiv(newDiv) {
-	const currentDiv = document.getElementById("tree"); 
+	const currentDiv = document.getElementById("tree");
 	currentDiv.appendChild(newDiv);
 }
 
 function do_something_with(data, matrix) {
-		
+
 	var scorelines = matrix.split("\n");
 	var xletters = [];
 	scorelines.forEach(element => {
@@ -247,7 +251,7 @@ function do_something_with(data, matrix) {
 				if (letter != "") {
 					xletters.push(letter);
 				}
-		
+
 			});
 		} else {
 			var scores = element.split(" ");
@@ -255,7 +259,7 @@ function do_something_with(data, matrix) {
 			var xPos = 0;
 			scores.forEach(digit => {
 				if (digit != "") {
-					if (yLetter == "") {yLetter = digit;}
+					if (yLetter == "") { yLetter = digit; }
 					else {
 						var intdigit = parseInt(digit);
 						var key = yLetter + xletters[xPos];
@@ -263,14 +267,17 @@ function do_something_with(data, matrix) {
 						xPos += 1;
 					}
 				}
-		
+
 			});
 		}
 
 	});
 
-	if (testingMode ) {	var lines = data.split("\n", 400);}
-	else {	var lines = data.split("\n");}
+
+	console.log(scoreMap);
+
+	if (testingMode) { var lines = data.split("\n", 400); }
+	else { var lines = data.split("\n"); }
 
 	var species = [];
 	lines.forEach(element => {
@@ -279,22 +286,21 @@ function do_something_with(data, matrix) {
 			var half1 = element.split("|"); // cut off the | before name
 			var half2 = half1[1].split("."); //cut off the . after name
 			half2[0] = half2[0].replace(/(\r\n|\n|\r)/gm, "");
-			if (!species.includes(half2[0])) 
-                {species.push(half2[0])} //add the species name to the list of species
-            var parents = half2[1].split("\t"); //split the remainder into a list of parent names
+			if (!species.includes(half2[0])) { species.push(half2[0]) } //add the species name to the list of species
+			var parents = half2[1].split("\t"); //split the remainder into a list of parent names
 			var currentParent = document.getElementById("tree"); //set first parent to the root node
 			var pleaseBreak = false; //workaround to "break" in foreach
 			parents.forEach(parent => { //build a tree of parents, if they don't already exist
-			parent = parent.replace(/(\r\n|\n|\r)/gm, ""); //removing bs invisible characters
-                if (parent === half2[0]) { //if the name of the next parent is the name of the species, end treebuilding.
+				parent = parent.replace(/(\r\n|\n|\r)/gm, ""); //removing bs invisible characters
+				if (parent === half2[0]) { //if the name of the next parent is the name of the species, end treebuilding.
 					pleaseBreak = true;
 				}
 				if (!pleaseBreak) {
 					currentParent = createNewParentDiv(parent, currentParent); //create current parent, and update tracked current parent
-				
+
 				}
-            })
-            addCheckBox(half2[0], currentParent); //add the current species to the bottom of the parent tree
+			})
+			addCheckBox(half2[0], currentParent); //add the current species to the bottom of the parent tree
 
 
 
