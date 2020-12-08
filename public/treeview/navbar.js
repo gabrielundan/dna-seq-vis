@@ -57,14 +57,14 @@ document.body.onload = loadTree;
 
 function loadTree () { 
 
-	jQuery.get('treeview/matrix.txt', function(matrix) {
-		jQuery.get('treeview/sequences_tax_mapping.txt', function(data) {
+	jQuery.get('https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/matrix.txt', function(matrix) {
+		jQuery.get('https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/sequences_tax_mapping_cleaned.txt', function(data) {
             do_something_with(data, matrix);
             mapSpecies(data);
 		 }, 'text');
 	 }, 'text');
 	
-	jQuery.get('treeview/aligned_unenrolled.faa', function(data) {
+	jQuery.get('https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/aligned_unenrolled.faa', function(data) {
 		readSequences(data);
 	});
 }
@@ -91,10 +91,6 @@ function addCheckBox(name, parent = document.getElementById("tree")) {
   newDiv.style.paddingLeft = "20px";
   newDiv.classList.add("nested");
   //newDiv.classList.add("active");
-
-
-  if (parent != document.getElementById("tree")) {
-}
 
   parent.appendChild(newDiv);
 }
@@ -142,8 +138,6 @@ function checkAbove(element) {
 	}
 
 	checkAbove(parent);
-
-
 }
 function propogateBelow(element, checked) {
 	console.log("propogating elements below with " + checked);
@@ -158,7 +152,6 @@ function propogateBelow(element, checked) {
 			
 		}
 	})
-
 }
 //Calls every time a checkbox value toggles
 function checkboxClick(value, nowChecked, pingC = true) {
@@ -177,9 +170,6 @@ function checkboxClick(value, nowChecked, pingC = true) {
 	if (pingC) {
 		pingChange();
 	}
-
-	//
-
 }
 
 function createNewParentDiv(name, parent = document.getElementById("tree")) {
@@ -194,8 +184,6 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 	newContent.style.cursor = "pointer";
 	newContent.style.userSelect = "none";
 	newDiv.style.backgroundColor = "lightblue";
-
-
 
 	newContent.addEventListener("click", function() {
 		var children = this.parentElement.querySelectorAll(".nested");
@@ -295,17 +283,8 @@ function do_something_with(data, matrix) {
 				}
             })
             addCheckBox(half2[0], currentParent); //add the current species to the bottom of the parent tree
-
-
-
-
-
-
-
 		}
-
 	});
-
 }
 
 /**

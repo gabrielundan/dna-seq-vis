@@ -1,1 +1,1 @@
-# data-seq-vis
+# dna-seq-vis

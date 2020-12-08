@@ -23,3 +23,19 @@ body {
   .collapsed::before {
 	transform: rotate(90deg);
   }
+  padding-top: 5.5rem;
+}
+
+#msa {
+  width: 100%;
+  height: 100%;
+  font-family: monospace;
+}
+
+.biojs_msa_overviewbox {
+  border: 1px solid #000000;
+}
+
+.biojs_msa_seqblock {
+  border: 1px solid #000000;
+}
