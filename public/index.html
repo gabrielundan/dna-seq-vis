@@ -78,23 +78,19 @@
 	// generate data
 	var values = [];
 	//add more pushes for more lines
-	for (var i = 0; i < 200; i++) {
+	for (var i = 0; i < 10; i++) {
 		values.push(fillData());
 	}
 
 	function fillData () {
 		var data = [];
-		var currentValue = 100;
-		var random = d3.randomNormal(200, 1000);
-
-		for(var i=0; i<200; i++) {
-			var currentDate = new Date();
-			currentDate.setDate(currentDate.getDate() + i);
-			data.push([currentDate, currentValue]);
-			currentValue = currentValue + random();
+		for(var i=0; i<20; i++) {
+			var random = d3.randomNormal(0, 100)();
+			data.push([i, random]);
 		}
 		return data;
 	}
+	console.log (values);
 
 	//-------------------------------
 	d3.selection.prototype.moveToFront = function() {
@@ -124,7 +120,7 @@
 
 		var ratio =  height / width;
 
-		var xScale = d3.scaleTime()
+		var xScale = d3.scaleLinear()
 		.range([0, width])
 		.domain([minX, maxX]);
 
@@ -209,7 +205,7 @@
 			.on("mouseover", function () {
 				d3.select(this).style("stroke-width", 4).attr('opacity', '1').moveToFront();
 				// tooltip.style("opacity", 1);
-				tooltip.text("ID: " + data[i][i][1]);
+				tooltip.text("ID: " + data[i][data[i].length/2][1]);
 			})
 			.on("mouseout", function () {
 				d3.select(this).style("stroke-width", 2).attr('opacity', 0.5);
