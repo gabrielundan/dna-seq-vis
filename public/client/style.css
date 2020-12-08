@@ -32,10 +32,10 @@ body {
   font-family: monospace;
 }
 
-.biojs_msa_overviewbox {
+canvas.biojs_msa_overviewbox {
   border: 1px solid #000000;
 }
 
-.biojs_msa_seqblock {
+canvas.biojs_msa_seqblock {
   border: 1px solid #000000;
 }
