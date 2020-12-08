@@ -25,10 +25,10 @@ async function decodeText(response) {
 
 
     var svg = d3.select("#dna_align")
-        .attr("viewbox", `0 0  ${width} ${height}`)
+        .append("svg")
+        .attr("viewbox", "0,0,150,420")
         .attr("width", "80%")
         .attr("height", "60%")
-        .attr("easypz", '{"applyTransformTo": ".transform"}')
         .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
