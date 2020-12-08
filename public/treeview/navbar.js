@@ -37,6 +37,11 @@ function getCurrentSpecies()
 var taxonomyIdMap = new Map();
 
 /**
+ * Map of species to array of sc. "":"AACTA2215-20"
+ */
+var speciesMap = new Map();
+
+/**
  * 
  * 
  * BEGIN OBSCURE NONSENSE. BEWARE YE ALL WHO VENTURE PAST THIS POINT
@@ -336,17 +341,18 @@ function computeScore(query, refs) {
 /**
  * Returns a map where each key is a taxonomyId that holds an array containing it's scores
  * @param {Array.string} taxonomyIds Array of taxonomy IDs to score
+ * @param {Array.string} compareIds Array of taxonomy IDs to fetch from
  * @return {Map} Each key is a taxonomyId (ex. "AACTA2215-20") that holds an array of integers representing the
  * score for each character in its sequence (ex. [2.12, 5.29, ...]).
  */
-function computeEntryScores(taxonomyIds) {
+function computeEntryScores(taxonomyIds, compareIds) {
 	let scoreMap = new Map();
 	Array(taxonomyIds).forEach((id) => {
 		let sequence = taxonomyIdMap.get(id);
 		let scores = [];
 		for (let i = 0; i < sequence.length; i++) {
 			let query = sequence.charAt(i);
-			let refs = getRefsByIndex(i);
+			let refs = getRefsByIndex(i, compareIds);
 			scores.push(computeScore(query, refs));
 		}
 		scoreMap.set(id, scores);
@@ -356,7 +362,7 @@ function computeEntryScores(taxonomyIds) {
 
 /**
  * Creates an array containing the letters of each sequence at a given index
- * @param {number} sequenceIndex Integer 
+ * @param {number} sequenceIndex Integer Index of DNA sequence to grab
  * @param {Array.string} compareIds Array of taxonomy IDs to fetch from
  * @return {Array} Array containing the letters of each sequence at provided index
  */
