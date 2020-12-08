@@ -17,8 +17,8 @@ var scoreMap = new Map();
  * Outside functions should be put in here. pingChange is called every time a change occurs in the currentlyActiveSpecies[]
  */
 function pingChange() {
-	console.log("active species updated!");
-	console.log(currentlyActiveSpecies);
+	// console.log("active species updated!");
+	// console.log(currentlyActiveSpecies);
 	//todo: put outside references here
 }
 
@@ -55,9 +55,10 @@ document.body.onload = loadTree;
 
 function loadTree() {
 
-	jQuery.get('treeview/matrix.txt', function (matrix) {
-		jQuery.get('treeview/sequences_tax_mapping.txt', function (data) {
-			do_something_with(data, matrix)
+	jQuery.get('https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/matrix.txt', function (matrix) {
+		jQuery.get('https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/sequences_tax_mapping_cleaned.txt', function (data) {
+			populateScoreMap(data, matrix)
+			mapSpecies(data);
 		}, 'text');
 	}, 'text');
 
@@ -78,7 +79,6 @@ function addCheckBox(name, parent = document.getElementById("tree")) {
 	newCheckbox.setAttribute("type", "checkbox");
 	newCheckbox.setAttribute("value", name);
 	newCheckbox.classList.add("checkbox");
-	newCheckbox.onclick = function () { checkboxClick(newCheckbox.value, newCheckbox.checked); checkAbove(newDiv); }
 
 	// add the text node to the newly created div
 	newDiv.classList.add(name.split(" ").join(""));
@@ -97,7 +97,7 @@ function addCheckBox(name, parent = document.getElementById("tree")) {
 }
 
 function checkAbove(element) {
-	console.log("checking elements above!");
+	// console.log("checking elements above!");
 	var parent = element.parentElement;
 	if (parent == document.getElementById("tree")) {
 		return;
@@ -108,7 +108,7 @@ function checkAbove(element) {
 	var allAreDisabled = true;
 
 	var childCheckboxes = parent.querySelectorAll(".checkbox");
-	console.log(childCheckboxes.length);
+	// console.log(childCheckboxes.length);
 
 	childCheckboxes.forEach(childbox => {
 		if (!allAreDisabled && !allAreEnabled) {
@@ -126,16 +126,16 @@ function checkAbove(element) {
 	if (allAreEnabled) {
 		checkbox.checked = true;
 		checkbox.indeterminate = false;
-		console.log("all are enabled!");
+		// console.log("all are enabled!");
 	}
 	else if (allAreDisabled) {
 		checkbox.checked = false;
 		checkbox.indeterminate = false;
-		console.log("disabled!");
+		// console.log("disabled!");
 	} else {
 		checkbox.checked = true;
 		checkbox.indeterminate = true;
-		console.log("indeterm!");
+		// console.log("indeterm!");
 	}
 
 	checkAbove(parent);
@@ -143,7 +143,7 @@ function checkAbove(element) {
 
 }
 function propogateBelow(element, checked) {
-	console.log("propogating elements below with " + checked);
+	// console.log("propogating elements below with " + checked);
 	var childCheckboxes = element.querySelectorAll(".checkbox");
 
 	var changedBoxes = [];
@@ -160,12 +160,12 @@ function propogateBelow(element, checked) {
 //Calls every time a checkbox value toggles
 function checkboxClick(value, nowChecked, pingC = true) {
 	if (nowChecked) {
-		console.log(value + " added to active!");
+		// console.log(value + " added to active!");
 		if (!currentlyActiveSpecies.includes(value)) {
 			currentlyActiveSpecies.push(value);
 		}
 	} else {
-		console.log(value + " removed from active!");
+		// console.log(value + " removed from active!");
 		if (currentlyActiveSpecies.includes(value)) {
 			var index = currentlyActiveSpecies.indexOf(value);
 			currentlyActiveSpecies.splice(index, 1);
@@ -174,16 +174,6 @@ function checkboxClick(value, nowChecked, pingC = true) {
 	if (pingC) {
 		pingChange();
 	}
-
-	// compute score of each row
-	let newScore = [];
-
-	getCurrentSpecies().forEach((sequence) => {
-		let ref = getCurrentSpecies();
-		newScore.push(computeEntryScores(sequence, ref.splice(ref.indexOf(sequence), 1)))
-	});
-
-	console.log(newScore);
 }
 
 function createNewParentDiv(name, parent = document.getElementById("tree")) {
@@ -211,13 +201,23 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 		})
 		newContent.classList.toggle("collapsed");
 
-		console.log("clicked one!");
+		// console.log("clicked one!");
 	});
+
 	newCheckbox.addEventListener("click", function (event) {
 		event.stopPropagation();
 		propogateBelow(newDiv, newCheckbox.checked);
 		checkAbove(newDiv);
 		pingChange();
+
+		// on click generate score for seq against all other actively displayed seq except itself
+		let scores = [];
+		const ids = getCurrentlyActiveTaxIds();
+		scores = computeEntryScores(ids, ids);
+		
+		// console.log(scores);
+
+		// update line chart
 	})
 
 	newDiv.appendChild(newContent);
@@ -240,7 +240,7 @@ function insertToTreeDiv(newDiv) {
 	currentDiv.appendChild(newDiv);
 }
 
-function do_something_with(data, matrix) {
+function populateScoreMap(data, matrix) {
 
 	var scorelines = matrix.split("\n");
 	var xletters = [];
@@ -274,7 +274,7 @@ function do_something_with(data, matrix) {
 	});
 
 
-	console.log(scoreMap);
+	// console.log(scoreMap);
 
 	if (testingMode) { var lines = data.split("\n", 400); }
 	else { var lines = data.split("\n"); }
@@ -353,16 +353,21 @@ function computeScore(query, refs) {
  */
 function computeEntryScores(taxonomyIds, compareIds) {
 	let scoreMap = new Map();
-	Array(taxonomyIds).forEach((id) => {
-		let sequence = taxonomyIdMap.get(id);
+	// console.log(taxonomyIds);
+
+	for (let i = 0; i < taxonomyIds.length; i++) {
+		let currId = taxonomyIds[i];
+		let tempCompareIds = Array.from(compareIds).splice(i, 1);
+		let sequence = taxonomyIdMap.get(currId);
 		let scores = [];
-		for (let i = 0; i < sequence.length; i++) {
-			let query = sequence.charAt(i);
-			let refs = getRefsByIndex(i, compareIds);
+		for (let j = 0; j < sequence.length; j++) {
+			let query = sequence.charAt(j);
+			let refs = getRefsByIndex(j, tempCompareIds);
 			scores.push(computeScore(query, refs));
 		}
-		scoreMap.set(id, scores);
-	});
+		scoreMap.set(currId, scores);
+	}
+
 	return scoreMap;
 }
 
