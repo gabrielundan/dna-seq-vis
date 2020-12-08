@@ -12,7 +12,7 @@ var m = msa({
         dropImport: false,
         debug: false,
         hasRef: false, // hasReference,
-        bootstrapMenu: true,
+        bootstrapMenu: false,
     },
     vis: {
         sequences: true,
@@ -76,9 +76,14 @@ var m = msa({
     }
 });
 
+// handle event when row clicked
+m.g.on("row:click", function (data) {
+    console.log(data);
+});
+
 (async () => {
     // get the data
-    const response = await getData();
+    const response = await getData("https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/aligned_unenrolled.faa");
 
     //get the text from the response
     const text = await decodeText(response);
