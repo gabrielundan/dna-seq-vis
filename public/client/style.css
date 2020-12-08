@@ -9,7 +9,9 @@ body {
 }
 
 .biojs_msa_overviewbox {
-  border-color: black;
-  border-width: 2px;
+  border: 1px solid #000000;
 }
 
+.biojs_msa_seqblock {
+  border: 1px solid #000000;
+}
