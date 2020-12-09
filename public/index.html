@@ -56,6 +56,26 @@
 			</div>
 		</div>
 	</div>
+	<div class="modal fade" id="overview-modal" tabindex="-1" role="dialog" aria-labelledby="overview-modal-title"
+		aria-hidden="true">
+		<div class="modal-dialog" style="max-width: 1140px;" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="overview-modal-title">DNA Sequence Overview</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div id="overview-content"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="container">
 		<div class="col">
 			<div class="row">	
@@ -69,6 +89,9 @@
 			<div class="row">
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filter-modal">
 					Filter DNA Sequences
+				</button>
+				<button type="button" class="btn btn-primary ml-2" data-toggle="modal" data-target="#overview-modal">
+					Show Overview
 				</button>
 				<div id="msa"></div>
 				<div id="line-graph"></div>
@@ -98,6 +121,15 @@
 	<!-- Project JS -->
 	<script type="application/javascript" src="client/util.js"></script>
 	<script type="application/javascript" src="client/alignment.js"></script>
+
+	<script>
+
+		function detachOverview() {
+			let a = $('.biojs_msa_overviewbox').detach();
+			a.appendTo('#overview-content');
+		} 
+		detachOverview();
+	</script>
 </body>
 
 </html>
