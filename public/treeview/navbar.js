@@ -68,29 +68,29 @@ function loadTree() {
 }
 
 function addCheckBox(name, parent = document.getElementById("tree")) {
-	if(document.getElementsByClassName(name.split(" ").join("")).length > 0) {return document.getElementsByClassName(name.split(" ").join(""))[0];}
-  // create a new div element 
-  const newDiv = document.createElement("div"); 
-  
-  // and give it some content 
-  newDiv.style.marginLeft = "25px";
-  const newContent = document.createTextNode("  " + name); 
-  const newCheckbox = document.createElement("INPUT");
-  newCheckbox.setAttribute("type", "checkbox");
-  newCheckbox.setAttribute("value", name);
-  newCheckbox.classList.add("checkbox");
-  newCheckbox.onclick = function() {checkboxClick(newCheckbox.value, newCheckbox.checked); checkAbove(newDiv);}
-  
-  // add the text node to the newly created div
-  newDiv.classList.add(name.split(" ").join(""));
-  newDiv.appendChild(newCheckbox);
-  newDiv.appendChild(newContent);  
+	if (document.getElementsByClassName(name.split(" ").join("")).length > 0) { return document.getElementsByClassName(name.split(" ").join(""))[0]; }
+	// create a new div element 
+	const newDiv = document.createElement("div");
 
-  newDiv.style.paddingLeft = "20px";
-  newDiv.classList.add("nested");
-  //newDiv.classList.add("active");
+	// and give it some content 
+	newDiv.style.marginLeft = "25px";
+	const newContent = document.createTextNode("  " + name);
+	const newCheckbox = document.createElement("INPUT");
+	newCheckbox.setAttribute("type", "checkbox");
+	newCheckbox.setAttribute("value", name);
+	newCheckbox.classList.add("checkbox");
+	newCheckbox.onclick = function () { checkboxClick(newCheckbox.value, newCheckbox.checked); checkAbove(newDiv); }
 
-  parent.appendChild(newDiv);
+	// add the text node to the newly created div
+	newDiv.classList.add(name.split(" ").join(""));
+	newDiv.appendChild(newCheckbox);
+	newDiv.appendChild(newContent);
+
+	newDiv.style.paddingLeft = "20px";
+	newDiv.classList.add("nested");
+	//newDiv.classList.add("active");
+
+	parent.appendChild(newDiv);
 
 }
 
@@ -204,16 +204,6 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 		propogateBelow(newDiv, newCheckbox.checked);
 		checkAbove(newDiv);
 		pingChange();
-
-		// on click generate score for seq against all other actively displayed seq except itself
-		let scores = [];
-		const ids = getCurrentlyActiveTaxIds();
-		scores = computeEntryScores(ids, ids);
-
-		// console.log(scores);
-
-		// update line chart
-		drawLinesGraph(400, 1200, scores, 'Score');
 	})
 
 	newDiv.appendChild(newContent);
@@ -237,7 +227,6 @@ function insertToTreeDiv(newDiv) {
 }
 
 function populateScoreMap(data, matrix) {
-
 	var scorelines = matrix.split("\n");
 	var xletters = [];
 	scorelines.forEach(element => {
@@ -280,7 +269,6 @@ function populateScoreMap(data, matrix) {
 
 	var species = [];
 	lines.forEach(element => {
-
 		if (element.includes("|") && element.includes(".")) {
 			var half1 = element.split("|"); // cut off the | before name
 			var half2 = half1[1].split("."); //cut off the . after name
@@ -297,8 +285,8 @@ function populateScoreMap(data, matrix) {
 				if (!pleaseBreak) {
 					currentParent = createNewParentDiv(parent, currentParent); //create current parent, and update tracked current parent
 				}
-            })
-            addCheckBox(half2[0], currentParent); //add the current species to the bottom of the parent tree
+			})
+			addCheckBox(half2[0], currentParent); //add the current species to the bottom of the parent tree
 		}
 	});
 }
@@ -309,13 +297,14 @@ function populateScoreMap(data, matrix) {
  */
 function readSequences(text) {
 	let lines = text.split("\n");
-	lines.forEach((line) => {
+	for (let i = 0; i < lines.length; i++) {
+		let line = lines[i];
 		if (line.length != 0) {
 			let taxonomyId = line.substring(1, line.indexOf("|"));
 			let sequence = line.substring(40);
 			taxonomyIdMap.set(taxonomyId, sequence);
 		}
-	});
+	}
 }
 
 /**
@@ -327,9 +316,11 @@ function readSequences(text) {
 function computeScore(query, refs) {
 	let score = 0;
 	let multiplier = 2 / refs.length;
-	refs.forEach((letter) => {
-		score += scoreMap.get(`${query}${letter}`) * multiplier;
-	});
+
+	for (let i = 0; i < refs.length; i++) {
+		score += scoreMap.get(`${query}${refs[i]}`) * multiplier;
+	}
+
 	return Number(score.toFixed(2));
 }
 
@@ -368,9 +359,9 @@ function computeEntryScores(taxonomyIds, compareIds) {
  */
 function getRefsByIndex(sequenceIndex, compareIds) {
 	let refs = [];
-	compareIds.forEach((value) => {
-		refs.push(taxonomyIdMap.get(value).charAt(sequenceIndex));
-	});
+	for (let i = 0; i < compareIds.length; i++) {
+		refs.push(taxonomyIdMap.get(compareIds[i]).charAt(sequenceIndex));
+	}
 	return refs;
 }
 
@@ -380,7 +371,9 @@ function getRefsByIndex(sequenceIndex, compareIds) {
  */
 function mapSpecies(text) {
 	let lines = text.split("\n");
-	lines.forEach((line) => {
+
+	for (let i = 0; i < lines.length; i++) {
+		let line = lines[i];
 		if (line.length > 0) {
 			let pipeSplit = line.split("|");
 			let taxId = pipeSplit[0];
@@ -393,7 +386,7 @@ function mapSpecies(text) {
 				speciesMap.set(species, [taxId]);
 			}
 		}
-	});
+	}
 }
 
 /**
@@ -401,8 +394,28 @@ function mapSpecies(text) {
  */
 function getCurrentlyActiveTaxIds() {
 	let taxIdArr = [];
-	currentlyActiveSpecies.forEach((species) => {
-		taxIdArr = taxIdArr.concat(speciesMap.get(species));
-	});
+	for (let i = 0; i < currentlyActiveSpecies.length; i++) {
+		taxIdArr = taxIdArr.concat(speciesMap.get(currentlyActiveSpecies[i]));
+	}
 	return taxIdArr;
 }
+
+
+/**
+ * add event listener for filter updates
+ */
+
+document.getElementById("filter-button").addEventListener("click", (e) => {
+	// on click generate score for seq against all other actively displayed seq except itself
+	let scores = [];
+	const ids = getCurrentlyActiveTaxIds();
+	scores = computeEntryScores(ids, ids);
+
+	// console.log(scores);
+
+	// update MSAViewer
+	updateMSAViewer(ids);
+
+	// update line chart
+	// drawLinesGraph(400, 1200, scores, 'Score');
+});

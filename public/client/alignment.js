@@ -11,17 +11,14 @@ var m = msa({
         alphabetSize: 20,
         dropImport: false,
         debug: false,
-        hasRef: false, // hasReference,
+        hasRef: true, // hasReference,
         bootstrapMenu: false,
     },
     vis: {
+        conserv: true,
         sequences: true,
         markers: true,
-        metacell: false,
-        conserv: false,
         overviewbox: true,
-        seqlogo: false,
-        gapHeader: false,
         leftHeader: true,
 
         // about the labels
@@ -30,11 +27,6 @@ var m = msa({
         labelId: false,
         labelPartition: false,
         labelCheckbox: false,
-
-        // meta stuff
-        metaGaps: true,
-        metaIdentity: true,
-        metaLinks: true
     },
     zoomer: {
         // general
@@ -42,7 +34,6 @@ var m = msa({
         alignmentHeight: 500,
         columnWidth: 15,
         rowHeight: 15,
-        autoResize: true, // only for the width
 
         // labels
         textVisible: true,
@@ -66,49 +57,33 @@ var m = msa({
         // overview box
         boxRectHeight: 1,
         boxRectWidth: 1,
-        overviewboxPaddingTop: 2,
-        overviewboxWidth: "fitted",
-
-        // meta cell
-        metaGapWidth: 35,
-        metaIdentWidth: 40,
-        metaLinksWidth: 25
+        overviewboxPadding: "50px",
+        overviewboxWidth: "auto",
+        overviewboxHeight: "50px",
+    },
+    visorder: {
+        overviewBox: 2,
+        alignmenBody: 1,
+        scaleSlider: -2,
     }
 });
+
+console.log(m);
 
 // handle event when row clicked
 m.g.on("row:click", function (data) {
     console.log(data);
 });
 
-(async () => {
-    // get the data
-    const response = await getData("https://raw.githubusercontent.com/gabrielundan/dna-seq-vis-data/master/aligned_unenrolled.faa");
+async function updateMSAViewer(taxonList) {
+    let data = ""
 
-    //get the text from the response
-    const text = await decodeText(response);
+    for (let i = 0; i < taxonList.length; i++) {
+        let currTaxonId = taxonList[i];
 
-    //split up the sequences
-    const lines = text.split("\n");
+        let currSeq = taxonomyIdMap.get(currTaxonId);
 
-    //data to be parsed by the MSAViewer
-    let data = "";
-
-    var i = 0
-
-    for (line of lines) {
-        if (line != "") {
-            var id = line.substr(0, 40).trim();
-            var seq = line.substr(40).trim();
-            // adding data while removing unused identifiers except the taxonomy id
-            data += id.split("|")[0] + "\n" + seq + "\n";
-            i++;
-        }
-
-        // only load 100 for now
-        if (i > 100) {
-            break;
-        }
+        data += ">" + currTaxonId + "\n" + currSeq + "\n";
     }
 
     // give the new data to MSAViwer
@@ -116,4 +91,4 @@ m.g.on("row:click", function (data) {
 
     // rerender
     m.render();
-})();
+}
