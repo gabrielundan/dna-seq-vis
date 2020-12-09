@@ -218,7 +218,7 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 		// console.log(scores);
 
 		// update line chart
-		drawLinesGraph(400, 1200, scores, 'Score');
+		drawLinesGraph(400, 1200, scores, 'Sequence Position', 'Score');
 	})
 
 	newDiv.appendChild(newContent);

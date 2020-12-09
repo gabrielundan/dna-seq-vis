@@ -12,35 +12,37 @@ function fillData(key, value) {
     return data;
 }
 
-function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
+function drawLinesGraph(containerHeight, containerWidth, dataInput, xLabel, yLabel) {
+    let fontFamily = 'Nunito Sans';
     let data = [];
     let taxIds = [];
     for (let [key, value] of dataInput) {
         data.push(fillData(key, value));
         taxIds.push(key);
     }
+
     d3.select("#line-graph").selectAll("svg").remove();
     d3.select("#line-graph").selectAll("g").remove();
 
-    let tooltip = d3.select("#line-graph")
-    .append("div")
-    .style("opacity", 1)
-    .attr("class", "tooltip")
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px")
-    .style("width", "12rem")
-    .style("height", "2.2rem")
-    .text("")
+    // let tooltip = d3.select("#line-graph")
+    // .append("div")
+    // .style("opacity", 1)
+    // .attr("class", "tooltip")
+    // .style("background-color", "white")
+    // .style("border", "solid")
+    // .style("border-width", "2px")
+    // .style("border-radius", "5px")
+    // .style("padding", "5px")
+    // .style("width", "12rem")
+    // .style("height", "2.2rem")
+    // .text("")
 
     let svg = d3.select('#line-graph')
     .append('svg')
     .attr('width', containerWidth)
     .attr('height', containerHeight);
 
-    var margin = {top: 50, left: 50, bottom: 50, right: 50};
+    var margin = {top: 75, left: 50, bottom: 50, right: 50};
 
     var height = containerHeight - margin.top - margin.bottom;
     var width = containerWidth - margin.right - margin.left;
@@ -90,16 +92,39 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
     .attr('transform', 'translate(0, ' + height + ')')
     .call(xAxis);
 
+    // chart title
+    svg.append("text")
+        // .attr("x", (width / 2))
+        // .attr("y", 0 - (margin.top / 2))
+        .attr("transform", "translate(" + (width/2) + " ," + (margin.top - 20) + ")")
+        .attr("text-anchor", "middle")
+        .attr("color", "black")
+        .style("font-family", fontFamily)
+        .style("font-size", "1.4em")
+        .style("text-decoration", "none")
+        .text("DNA Sequence Scores");
+
+    // x-axis Label
+    svg.append("text")
+    .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 38) + ")")
+    // .attr('fill', 'rgb(54, 54, 54)')
+    .attr("font-family", fontFamily)
+    .attr("font-size", "0.9em")
+    .style("text-anchor", "middle")
+    .text(xLabel);
+
+    // y-axis Label
     g.append('g')
     .attr('class', 'axis--y')
     .call(yAxis)
     .append('text')
     .attr('transform', 'rotate(-90)')
-    .attr('y', 10)
+    .attr('y', 13)
     .attr('dy', '.1em')
     .attr('text-anchor', 'end')
-    .attr('fill', 'rgb(54, 54, 54)')
-    .attr('font-size', '1.2em')
+    .attr('fill', 'rgb(0, 0, 0)')
+    .attr("font-family", fontFamily)
+    .attr('font-size', '1.35em')
     .text(yLabel)
 
     g.append('defs')
@@ -257,4 +282,4 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
 }
 
 //draw empty graph
-drawLinesGraph(400, 1200, [], 'Score');
+drawLinesGraph(400, 1200, [], 'Sequence Position', 'Score');
