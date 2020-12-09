@@ -24,7 +24,7 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
 
     let tooltip = d3.select("#line-graph")
     .append("div")
-    .style("opacity", 1)
+    .style("opacity", 0)
     .attr("class", "tooltip")
     .style("background-color", "white")
     .style("border", "solid")
@@ -37,6 +37,8 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
 
     let svg = d3.select('#line-graph')
     .append('svg')
+    .attr('id', 'line-graph-svg')
+    .attr('class', 'collapse')
     .attr('width', containerWidth)
     .attr('height', containerHeight);
 

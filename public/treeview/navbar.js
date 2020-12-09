@@ -406,20 +406,32 @@ function getCurrentlyActiveTaxIds() {
  */
 
 document.getElementById("filter-button").addEventListener("click", (e) => {
-	// on click generate score for seq against all other actively displayed seq except itself
-	let scores = [];
-	const ids = getCurrentlyActiveTaxIds();
-	scores = computeEntryScores(ids, ids);
+	if (currentlyActiveSpecies.length > 0) {
+		// on click generate score for seq against all other actively displayed seq except itself	
+		let scores = [];
+		const ids = getCurrentlyActiveTaxIds();
+		scores = computeEntryScores(ids, ids);
 
-	// console.log(scores);
+		// console.log(scores);
 
-	// update MSAViewer
-	updateMSAViewer(ids);
+		// update MSAViewer
+		updateMSAViewer(ids);
 
-	// Detach and move biojs_msa_overviewbox
-	let a = $('.biojs_msa_overviewbox').detach();
-	a.appendTo('#overview-content');
+		// Detach and move biojs_msa_overviewbox
+		let a = $('.biojs_msa_overviewbox').detach();
+		a.appendTo('#overview-content');
 
-	// update line chart
-	drawLinesGraph(400, 1200, scores, 'Score');
+		// update line chart
+		drawLinesGraph(400, 1200, scores, 'Score');
+
+		// Show all the visuals
+		$('#line-graph-svg').show();
+		$('#overview-button').show();
+		$('#msa').show();
+	} else {
+		// Hide all the visuals
+		$('#line-graph-svg').hide();
+		$('#overview-button').hide();
+		$('#msa').hide();
+	}
 });
