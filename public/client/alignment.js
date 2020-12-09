@@ -11,17 +11,14 @@ var m = msa({
         alphabetSize: 20,
         dropImport: false,
         debug: false,
-        hasRef: false, // hasReference,
+        hasRef: true, // hasReference,
         bootstrapMenu: false,
     },
     vis: {
+        conserv: true,
         sequences: true,
         markers: true,
-        metacell: false,
-        conserv: false,
         overviewbox: true,
-        seqlogo: false,
-        gapHeader: false,
         leftHeader: true,
 
         // about the labels
@@ -30,11 +27,6 @@ var m = msa({
         labelId: false,
         labelPartition: false,
         labelCheckbox: false,
-
-        // meta stuff
-        metaGaps: true,
-        metaIdentity: true,
-        metaLinks: true
     },
     zoomer: {
         // general
@@ -42,7 +34,6 @@ var m = msa({
         alignmentHeight: 500,
         columnWidth: 15,
         rowHeight: 15,
-        autoResize: true, // only for the width
 
         // labels
         textVisible: true,
@@ -66,17 +57,14 @@ var m = msa({
         // overview box
         boxRectHeight: 1,
         boxRectWidth: 1,
-        overviewboxPaddingTop: 2,
+        overviewboxPadding: "50px",
         overviewboxWidth: "auto",
-
-        // meta cell
-        metaGapWidth: 35,
-        metaIdentWidth: 40,
-        metaLinksWidth: 25
+        overviewboxHeight: "50px",
     },
     visorder: {
+        overviewBox: 2,
         alignmenBody: 1,
-        overviewBox: -1,
+        scaleSlider: -2,
     }
 });
 
