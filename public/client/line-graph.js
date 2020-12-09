@@ -72,18 +72,18 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
     .domain([0, data.length])
     .range(d3.schemeCategory20);
 
-    var xAxis = d3.axisBottom(xScale),
-    yAxis = d3.axisLeft(yScale);
+    var xAxis = d3.axisBottom(xScale);
+    var yAxis = d3.axisLeft(yScale);
 
-    // var brush = d3.brush().on("end", brushended),
-    // idleTimeout,
-    // idleDelay = 350;
+    var brush = d3.brush().on("end", brushended),
+    idleTimeout,
+    idleDelay = 350;
 
     // var drag = d3.drag().on('drag', dragged);
 
     svg.append("g")
-    // .attr("class", "brush")
-    // .call(brush);
+    .attr("class", "brush")
+    .call(brush);
 
     g.append('g')
     .attr('class', 'axis--x')
@@ -177,10 +177,10 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
     //     .attr('class', 'circle focusCircle');
 
 
-    // svg.select('.overlay')
-    // .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
-    // .attr('width', width)
-    // .attr('height', height)
+    svg.select('.overlay')
+    .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+    .attr('width', width)
+    .attr('height', height)
     // .on('mouseover', function() { focus.style('display', null); })
     // .on('mouseout', function() { focus.style('display', 'none'); })
     // .on('mousemove', function() {
@@ -207,44 +207,44 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
     // .on('contextmenu', function() {
     //     this.dispatchEvent(new Event('drag'));
     //     d3.event.preventDefault();
-    // });
+    // })
     // .on('drag', drag);
 
 
-    // function brushended() {
-    //     var s = d3.event.selection;
-    //     if (!s) {
-    //         if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
-    //         xScale.domain([minX, maxX]);
-    //         yScale.domain([minY, maxY]);
-    //     } else {
-    //         xScale.domain([s[0][0] * ratio, s[1][0]].map(xScale.invert, xScale));
-    //         yScale.domain([s[1][1], s[0][1] * ratio].map(yScale.invert, yScale));
-    //         svg.select(".brush").call(brush.move, null);
-    //     }
-    //     zoom();
-    // }
-    //
-    // function idled() {
-    //     idleTimeout = null;
-    // }
+    function brushended() {
+        var s = d3.event.selection;
+        if (!s) {
+            if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
+            xScale.domain([minX, maxX]);
+            yScale.domain([minY, maxY]);
+        } else {
+            xScale.domain([s[0][0] * ratio, s[1][0]].map(xScale.invert, xScale));
+            yScale.domain([s[1][1], s[0][1] * ratio].map(yScale.invert, yScale));
+            svg.select(".brush").call(brush.move, null);
+        }
+        zoom();
+    }
 
-    // function zoom() {
-    //     var t = svg.transition().duration(750);
-    //     svg.select(".axis--x").transition(t).call(xAxis);
-    //     g.select(".axis--y").transition(t).call(yAxis);
-    //     g.selectAll(".circles").transition(t)
-    //     .attr("cx", function(d) { return xScale(d[0]); })
-    //     .attr("cy", function(d) { return yScale(d[1]); });
-    //     g.selectAll(".line").transition(t)
-    //     .attr("d", function(d) { return line(d); });
-    //
-    //     voronoiDiagram = d3.voronoi()
-    //     .x(function(d) {return xScale(d[0]); })
-    //     .y(function(d) {return yScale(d[1]); })
-    //     .size([containerWidth, containerHeight])(vorData);
-    //
-    // }
+    function idled() {
+        idleTimeout = null;
+    }
+
+    function zoom() {
+        var t = svg.transition().duration(750);
+        svg.select(".axis--x").transition(t).call(xAxis);
+        g.select(".axis--y").transition(t).call(yAxis);
+        g.selectAll(".circles").transition(t)
+        .attr("cx", function(d) { return xScale(d[0]); })
+        .attr("cy", function(d) { return yScale(d[1]); });
+        g.selectAll(".line").transition(t)
+        .attr("d", function(d) { return line(d); });
+
+        // voronoiDiagram = d3.voronoi()
+        // .x(function(d) {return xScale(d[0]); })
+        // .y(function(d) {return yScale(d[1]); })
+        // .size([containerWidth, containerHeight])(vorData);
+
+    }
 
     // function dragged() {
     //     d3.selectAll('.line')
