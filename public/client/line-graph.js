@@ -1,5 +1,5 @@
-d3.selection.prototype.moveToFront = function() {
-    return this.each(function(){
+d3.selection.prototype.moveToFront = function () {
+    return this.each(function () {
         this.parentNode.appendChild(this);
     });
 };
@@ -12,133 +12,135 @@ function fillData(key, value) {
     return data;
 }
 
-function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
-    let data = [];
-    let taxIds = [];
+function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel) {
+    scores = [];
+    sequences = [];
     for (let [key, value] of dataInput) {
-        data.push(fillData(key, value));
-        taxIds.push(key);
+        scores.push(fillData(key, value));
+        sequences.push(key);
     }
+
     d3.select("#line-graph").selectAll("svg").remove();
     d3.select("#line-graph").selectAll("g").remove();
 
     let tooltip = d3.select("#line-graph")
-    .append("div")
-    .style("opacity", 0)
-    .attr("class", "tooltip")
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px")
-    .style("width", "12rem")
-    .style("height", "2.2rem")
-    .text("")
+        .append("div")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+        .style("width", "12rem")
+        .style("height", "2.2rem")
+        .text("")
 
     let svg = d3.select('#line-graph')
-    .append('svg')
-    .attr('id', 'line-graph-svg')
-    .attr('class', 'collapse')
-    .attr('width', containerWidth)
-    .attr('height', containerHeight);
+        .append('svg')
+        .attr('id', 'line-graph-svg')
+        .attr('class', 'collapse')
+        .attr('width', containerWidth)
+        .attr('height', containerHeight);
 
-    var margin = {top: 50, left: 50, bottom: 50, right: 50};
+    var margin = { top: 50, left: 50, bottom: 50, right: 50 };
 
     var height = containerHeight - margin.top - margin.bottom;
     var width = containerWidth - margin.right - margin.left;
 
     var g = svg.append('g')
-    .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
-    .attr('overflow', 'hidden');
+        .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+        .attr('overflow', 'hidden');
 
-    var minX = d3.min(data, function(d){ return d3.min(d, function(e){return e[0]})});
-    var maxX = d3.max(data, function(d){ return d3.max(d, function(e){return e[0]})});
-    var minY = d3.min(data, function(d){ return d3.min(d, function(e){return e[1]})});
-    var maxY = d3.max(data, function(d){ return d3.max(d, function(e){return e[1]})});
+    var minX = d3.min(scores, function (d) { return d3.min(d, function (e) { return e[0] }) });
+    var maxX = d3.max(scores, function (d) { return d3.max(d, function (e) { return e[0] }) });
+    var minY = d3.min(scores, function (d) { return d3.min(d, function (e) { return e[1] }) });
+    var maxY = d3.max(scores, function (d) { return d3.max(d, function (e) { return e[1] }) });
 
-    var ratio =  height / width;
+    var ratio = height / width;
 
     var xScale = d3.scaleLinear()
-    .range([0, width])
-    .domain([minX, maxX]);
+        .range([0, width])
+        .domain([minX, maxX]);
 
     var yScale = d3.scaleLinear()
-    .range([height, 0])
-    .domain([minY, maxY]);
+        .range([height, 0])
+        .domain([minY, maxY]);
 
     var line = d3.line()
-    .x(function(d) { return xScale(d[0]); })
-    .y(function(d) { return yScale(d[1]); });
+        .x(function (d) { return xScale(d[0]); })
+        .y(function (d) { return yScale(d[1]); });
 
     var colors = d3.scaleOrdinal()
-    .domain([0, data.length])
-    .range(d3.schemeCategory20);
+        .domain([0, scores.length])
+        .range(d3.schemeCategory20);
 
     var xAxis = d3.axisBottom(xScale);
     var yAxis = d3.axisLeft(yScale);
 
     var brush = d3.brush().on("end", brushended),
-    idleTimeout,
-    idleDelay = 350;
+        idleTimeout,
+        idleDelay = 350;
 
     // var drag = d3.drag().on('drag', dragged);
 
     svg.append("g")
-    .attr("class", "brush")
-    .call(brush);
+        .attr("class", "brush")
+        .call(brush);
 
     g.append('g')
-    .attr('class', 'axis--x')
-    .attr('transform', 'translate(0, ' + height + ')')
-    .call(xAxis);
+        .attr('class', 'axis--x')
+        .attr('transform', 'translate(0, ' + height + ')')
+        .call(xAxis);
 
     g.append('g')
-    .attr('class', 'axis--y')
-    .call(yAxis)
-    .append('text')
-    .attr('transform', 'rotate(-90)')
-    .attr('y', 10)
-    .attr('dy', '.1em')
-    .attr('text-anchor', 'end')
-    .attr('fill', 'rgb(54, 54, 54)')
-    .attr('font-size', '1.2em')
-    .text(yLabel)
+        .attr('class', 'axis--y')
+        .call(yAxis)
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 10)
+        .attr('dy', '.1em')
+        .attr('text-anchor', 'end')
+        .attr('fill', 'rgb(54, 54, 54)')
+        .attr('font-size', '1.2em')
+        .text(yLabel)
 
     g.append('defs')
-    .append('clipPath')
-    .attr('id', 'clip')
-    .append('rect')
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('width', width)
-    .attr('height', height);
+        .append('clipPath')
+        .attr('id', 'clip')
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', width)
+        .attr('height', height);
 
     var main = g.append('g')
-    .attr('class', 'main')
-    .attr('clip-path', 'url(#clip)');
+        .attr('class', 'main')
+        .attr('clip-path', 'url(#clip)');
 
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < scores.length; i++) {
         main.append('path')
-        .datum(data[i])
-        .attr('d', line)
-        .attr('stroke', d => colors(i))
-        .attr('stroke-width', 2)
-        .attr('opacity', 0.5)
-        .attr('fill', 'none')
-        .attr('class', 'line')
-        .on("mouseover", function () {
-            d3.select(this).style("stroke-width", 4).attr('opacity', '1').moveToFront();
-            // tooltip.style("opacity", 1);
-            tooltip.text("ID: " + taxIds[i]);
-        })
-        .on("mouseout", function () {
-            d3.select(this).style("stroke-width", 2).attr('opacity', 0.5);
-            // tooltip.style("opacity", 0);
-            tooltip.text("");
-        })
-        .on("click", function () {
-            d3.select(this).attr('stroke', 'black');
-        })
+            .datum(scores[i])
+            .attr('d', line)
+            .attr('stroke', d => colors(i))
+            .attr('id', 'seq-' + i + '-line-graph')
+            .attr('stroke-width', 2)
+            .attr('opacity', 0.5)
+            .attr('fill', 'none')
+            .attr('class', 'line')
+            .on("mouseover", function () {
+                d3.select(this).style("stroke-width", 4).attr('opacity', '1').moveToFront();
+                // tooltip.style("opacity", 1);
+                tooltip.text("ID: " + sequences[i]);
+            })
+            .on("mouseout", function () {
+                d3.select(this).style("stroke-width", 2).attr('opacity', 0.5);
+                // tooltip.style("opacity", 0);
+                tooltip.text("");
+            })
+            .on("click", function () {
+                d3.select(this).attr('stroke', 'black');
+            });
 
         // main.selectAll('.circle').data(data[i]).enter().append('circle')
         //   .attr('cx', function(d) { return xScale(d[0]); })
@@ -180,9 +182,9 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
 
 
     svg.select('.overlay')
-    .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
-    .attr('width', width)
-    .attr('height', height)
+        .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+        .attr('width', width)
+        .attr('height', height)
     // .on('mouseover', function() { focus.style('display', null); })
     // .on('mouseout', function() { focus.style('display', 'none'); })
     // .on('mousemove', function() {
@@ -236,10 +238,10 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, yLabel){
         svg.select(".axis--x").transition(t).call(xAxis);
         g.select(".axis--y").transition(t).call(yAxis);
         g.selectAll(".circles").transition(t)
-        .attr("cx", function(d) { return xScale(d[0]); })
-        .attr("cy", function(d) { return yScale(d[1]); });
+            .attr("cx", function (d) { return xScale(d[0]); })
+            .attr("cy", function (d) { return yScale(d[1]); });
         g.selectAll(".line").transition(t)
-        .attr("d", function(d) { return line(d); });
+            .attr("d", function (d) { return line(d); });
 
         // voronoiDiagram = d3.voronoi()
         // .x(function(d) {return xScale(d[0]); })
