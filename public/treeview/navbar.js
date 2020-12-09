@@ -204,6 +204,16 @@ function createNewParentDiv(name, parent = document.getElementById("tree")) {
 		propogateBelow(newDiv, newCheckbox.checked);
 		checkAbove(newDiv);
 		pingChange();
+
+		// // on click generate score for seq against all other actively displayed seq except itself
+		// let scores = [];
+		// const ids = getCurrentlyActiveTaxIds();
+		// scores = computeEntryScores(ids, ids);
+
+		// // console.log(scores);
+
+		// // update line chart
+		// drawLinesGraph(400, 1200, scores, 'Sequence Position', 'Score');
 	})
 
 	newDiv.appendChild(newContent);
@@ -422,7 +432,7 @@ document.getElementById("filter-button").addEventListener("click", (e) => {
 		a.appendTo('#overview-content');
 
 		// update line chart
-		drawLinesGraph(400, 1200, scores, 'Score');
+		drawLinesGraph(400, 1200, scores, 'Sequence Position', 'Score');
 
 		// Show all the visuals
 		$('#line-graph-svg').show();
