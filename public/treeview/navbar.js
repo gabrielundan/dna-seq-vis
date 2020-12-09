@@ -416,6 +416,10 @@ document.getElementById("filter-button").addEventListener("click", (e) => {
 	// update MSAViewer
 	updateMSAViewer(ids);
 
+	// Detach and move biojs_msa_overviewbox
+	let a = $('.biojs_msa_overviewbox').detach();
+	a.appendTo('#overview-content');
+
 	// update line chart
-	// drawLinesGraph(400, 1200, scores, 'Score');
+	drawLinesGraph(400, 1200, scores, 'Score');
 });

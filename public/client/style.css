@@ -34,8 +34,15 @@ body {
 
 canvas.biojs_msa_overviewbox {
   border: 1px solid #000000;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 canvas.biojs_msa_seqblock {
   border: 1px solid #000000;
+}
+
+div.biojs_msa_conserv svg {
+  border: 1px solid #000000;
+  margin-bottom: 5px
 }

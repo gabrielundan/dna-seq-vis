@@ -57,13 +57,11 @@ var m = msa({
         // overview box
         boxRectHeight: 1,
         boxRectWidth: 1,
-        overviewboxPadding: "50px",
         overviewboxWidth: "auto",
-        overviewboxHeight: "50px",
     },
     visorder: {
         overviewBox: 2,
-        alignmenBody: 1,
+        alignmentBody: 1,
         scaleSlider: -2,
     }
 });
