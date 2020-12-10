@@ -6,9 +6,16 @@ d3.selection.prototype.moveToFront = function () {
 
 function fillData(key, value) {
     var data = [];
+    var offset = 0;
+    //var baseScore = 2;
     for (let i = 0; i < value.length; i++) {
-        data.push([i, value[i]]);
+        //if (value[i] == baseScore) {
+        //    offset += 1;
+        //} else {
+            data.push([i - offset, value[i]]);
+        //}
     }
+    console.log(value);
     return data;
 }
 
@@ -24,18 +31,18 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, xLabel, yLab
     d3.select("#line-graph").selectAll("svg").remove();
     d3.select("#line-graph").selectAll("g").remove();
 
-    // let tooltip = d3.select("#line-graph")
-    //     .append("div")
-    //     .style("opacity", 0)
-    //     .attr("class", "tooltip")
-    //     .style("background-color", "white")
-    //     .style("border", "solid")
-    //     .style("border-width", "2px")
-    //     .style("border-radius", "5px")
-    //     .style("padding", "5px")
-    //     .style("width", "12rem")
-    //     .style("height", "2.2rem")
-    //     .text("")
+     let tooltip = d3.select("#line-graph")
+         .append("div")
+         .style("opacity", 0)
+         .attr("class", "tooltip")
+         .style("background-color", "white")
+         .style("border", "solid")
+         .style("border-width", "2px")
+         .style("border-radius", "5px")
+         .style("padding", "5px")
+         .style("width", "12rem")
+         .style("height", "2.2rem")
+         .text("")
 
     let svg = d3.select('#line-graph')
         .append('svg')
@@ -79,15 +86,15 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, xLabel, yLab
     var xAxis = d3.axisBottom(xScale);
     var yAxis = d3.axisLeft(yScale);
 
-    var brush = d3.brush().on("end", brushended),
-        idleTimeout,
-        idleDelay = 350;
+    //var brush = d3.brush().on("end", brushended),
+      //  idleTimeout,
+      //  idleDelay = 350;
 
     // var drag = d3.drag().on('drag', dragged);
 
-    svg.append("g")
-        .attr("class", "brush")
-        .call(brush);
+    //svg.append("g")
+      //  .attr("class", "brush")
+      //  .call(brush);
 
     g.append('g')
         .attr('class', 'axis--x')
@@ -154,16 +161,16 @@ function drawLinesGraph(containerHeight, containerWidth, dataInput, xLabel, yLab
             .attr('class', 'line')
             .on("mouseover", function () {
                 d3.select(this).style("stroke-width", 4).attr('opacity', '1').moveToFront();
-                // tooltip.style("opacity", 1);
-                //tooltip.text("ID: " + sequences[i]);
+                 tooltip.style("opacity", 1);
+                tooltip.text("ID: " + sequences[i]);
             })
             .on("mouseout", function () {
                 d3.select(this).style("stroke-width", 2).attr('opacity', 0.5);
-                // tooltip.style("opacity", 0);
-                //tooltip.text("");
+                 tooltip.style("opacity", 0);
+                tooltip.text("");
             })
             .on("click", function () {
-                d3.select(this).attr('stroke', 'black');
+                //d3.select(this).attr('stroke', 'black');
             });
 
         // main.selectAll('.circle').data(data[i]).enter().append('circle')

@@ -352,8 +352,20 @@ function computeEntryScores(taxonomyIds, compareIds) {
 		let scores = [];
 		for (let j = 0; j < sequence.length; j++) {
 			let query = sequence.charAt(j);
+			
 			let refs = getRefsByIndex(j, tempCompareIds);
-			scores.push(computeScore(query, refs));
+			allIsBlank = true;
+			refs.forEach(ref => {
+				if (ref != '-') {
+					allIsBlank = false;
+				}
+			})
+			if (query != '-') {
+				allIsBlank = false;
+			}
+			if (!allIsBlank) {
+				scores.push(computeScore(query, refs));
+			}
 		}
 		scoreMap.set(currId, scores);
 	}

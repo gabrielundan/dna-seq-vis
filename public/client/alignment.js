@@ -121,13 +121,36 @@ async function updateMSAViewer(taxonList) {
 
     sequences = [];
 
+    taxons = [];
+
     for (let i = 0; i < taxonList.length; i++) {
         let currTaxonId = taxonList[i];
 
         let currSeq = taxonomyIdMap.get(currTaxonId);
 
-        data += ">" + currTaxonId + "\n" + currSeq + "\n";
+        taxons.push([currTaxonId, currSeq]);
     }
+    if(taxons.length > 0) {
+        console.log(taxons);
+        for (let i = 0; i < taxons[0][1].length; i++) {
+            allAreDash = true;
+            taxons.forEach(taxon => {
+                if (taxon[1].charAt(i) != '-') {
+                    allAreDash = false;
+                }
+            })
+            if (allAreDash) {
+                taxons.forEach(taxon => {
+                    taxon[1] = taxon[1].slice(0, i) + taxon[1].slice(i + 1);
+                })
+                i -= 1;
+            }
+        }
+    }
+    taxons.forEach(taxon => {
+        data += ">" + taxon[0] + "\n" + taxon[1] + "\n";
+    })
+
 
     // give the new data to MSAViwer
     m.seqs.reset(msa.io.fasta.parse(data));
